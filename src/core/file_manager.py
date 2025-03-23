@@ -2,53 +2,65 @@
 
 import os
 import json
-from dotenv import load_dotenv, find_dotenv
-
-load_dotenv(find_dotenv())
+from typing import Any
 
 class StorageEngine():
     """this is used for data persistency"""
-    def __init__(self, db_name):
-        self.path = f"{os.getenv("ROOT")}/data/{db_name}_db"
-        dbs = StorageEngine.list_db()
-        self.metadata = Metadata(db_name)
-        if f"{db_name}_db" in dbs:
-            print(f"Cannot create database: {db_name} already exists.")
-        else:
-            os.mkdir(self.path)
-            with open(f"{self.path}/metadata", 'w', encoding="utf-8") as file:
-                infos = {  "db_name": db_name,"tables": [] }
-                json.dump(infos, file, indent=4)
-            print("Database created")
-
+    path = f"{os.getenv("ROOT")}/data/"
+    def __init__(self):
+        self.metadata: Any
+        self.tables = []
+        if not os.path.isdir(self.path):
+            os.makedirs(self.path)
 
     def drop(self):
         """remove the database"""
         os.chdir(os.getenv("ROOT"))
         os.rmdir(self.path)
 
-    def use(self):
+    def use(self, db_name):
         """switch to the database dir"""
         try:
-            os.chdir(self.path)
+            os.chdir(f"{self.path}/{db_name}_db")
+            print(f"Switch to database {db_name} successfully")
         except FileNotFoundError as file_not_found:
             print(f"{file_not_found.filename} This database does not exists.")
 
     def create_table(self, table_name, schema: dict[str, any]):
         """create table and schema for the named table"""
-        tables = os.listdir(self.path)
-        if table_name in tables:
+        self.tables = os.listdir(self.path)
+        if table_name in self.tables:
             print(f"Table: {table_name} already exists")
         else:
             os.chdir(self.path)
-            self.metadata.write_metadata(table_name, schema)
-            print(f"Table {table_name} created")
+            self.tables.append(table_name)
+            with open(table_name, 'w', encoding='utf-8') as _:
+                self.metadata.write_metadata(table_name, schema)
+                print(f"Table {table_name} created")
     @staticmethod
     def list_db():
         """list all database"""
         db = f"{os.getenv("ROOT")}/data"
-        return os.listdir(db)
-
+        return "-".join(os.listdir(db))
+    @classmethod
+    def create_database(cls, db_name):
+        """this create a databse from a storage engine class"""
+        cls.path = f"{os.getenv("ROOT")}/data/{db_name}_db"
+        dbs = StorageEngine.list_db()
+        cls.metadata = Metadata(db_name)
+        if f"{db_name}_db" in dbs:
+            print(f"Cannot create database: {db_name} already exists.")
+        else:
+            os.mkdir(cls.path)
+            with open(f"{cls.path}/metadata", 'w', encoding="utf-8") as file:
+                infos = {  "db_name": db_name,"tables": [] }
+                json.dump(infos, file, indent=4)
+            print("Database created")
+    @classmethod
+    def list_tables(cls, db_name):
+        """List all table in a database"""
+        tables = os.listdir(f"{cls.path}/{db_name}_db")
+        return "\t".join(tables)
 
 class Metadata():
     """the metadata of table"""
@@ -67,4 +79,4 @@ class Metadata():
     def load_metadata(self):
         """load metadata in json format"""
         with open(self.path, 'r', encoding='utf-8') as metadata:
-            return metadata.read()
+            return json.load(metadata)

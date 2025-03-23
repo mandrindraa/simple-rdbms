@@ -3,8 +3,14 @@ it is the main file of the project
 """
 
 from core.file_manager import StorageEngine
+from query.executor import SQLExecutor
 
 
-test1 = StorageEngine("test")
-test1.create_table("users", {"name": "str", "age": "int"})
-test1.create_table("emails", {"provider": ["str", "primary key"], "email": "str"})
+if __name__ == "__main__":
+    storage_engine = StorageEngine()
+    executor = SQLExecutor(storage_engine)
+    while True:
+        command = input("SSQL:# ")
+        if command.lower() in ["exit", "quit"]:
+            break
+        executor.execute(command)
