@@ -41,7 +41,7 @@ class StorageEngine():
     def list_db():
         """list all database"""
         db = f"{os.getenv("ROOT")}/data"
-        return "-".join(os.listdir(db))
+        return "|".join(os.listdir(db))
     @classmethod
     def create_database(cls, db_name):
         """this create a databse from a storage engine class"""

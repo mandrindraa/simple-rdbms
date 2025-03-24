@@ -30,23 +30,25 @@ class SQLExecutor:
     def _handle_use(self, statement):
         """Handle database switch"""
         tokens = [token for token in statement.tokens if not token.is_whitespace]
-        print(f"From use, {tokens}")
         for i, token in enumerate(tokens):
             if token.ttype == Keyword and token.value.upper() == "USE":
                 db_name = tokens[i+1].get_real_name()
                 self.storage_engine.use(db_name)
     def _handle_list(self, statement):
         """Handle LIST <TABLE | DATABASE> commands."""
-        tokens = [token for token in statement.tokens if not token.is_whitespace]
-        for i, token in enumerate(tokens):
-            if token.ttype == Identifier and token.value.upper() == "LIST":
-                print("From list")
-                action = tokens[i+1].get_real_name()
-                if action.upper() == "TABLE":
-                    db_name = tokens[i+2].get_real_name()
-                    print(StorageEngine.list_tables(db_name))
-                else:
-                    print(StorageEngine.list_db())
+        command = str(statement).strip().upper()
+        if command.startswith("LIST DATABASES"):
+            print("Databases:")
+            print(self.storage_engine.list_db())
+        elif command.startswith("LIST TABLES"):
+            parts = command.split()
+            if len(parts) == 3:
+                print(f"Tables in database '{parts[2]}':")
+                print(self.storage_engine.list_tables())
+            else:
+                print("Invalid LIST TABLES syntax.")
+        else:
+            print("Invalid LIST command.")
 
     def _handle_create(self, statement):
         """Handle CREATE <TABLE | DATABASE> commands."""
