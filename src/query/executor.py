@@ -43,7 +43,7 @@ class SQLExecutor:
             parts = command.split()
             if len(parts) == 3:
                 print(f"Tables in database '{parts[2]}':")
-                print(self.storage_engine.list_tables())
+                print(self.storage_engine.list_tables(parts[2].lower()))
             else:
                 print("Invalid LIST TABLES syntax.")
         else:

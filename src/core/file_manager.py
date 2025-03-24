@@ -60,6 +60,9 @@ class StorageEngine():
     def list_tables(cls, db_name):
         """List all table in a database"""
         tables = os.listdir(f"{cls.path}/{db_name}_db")
+        for i in tables:
+            if i == "metadata":
+                tables.remove(i)
         return "\t".join(tables)
 
 class Metadata():
