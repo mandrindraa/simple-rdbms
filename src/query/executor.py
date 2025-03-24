@@ -2,9 +2,8 @@
 SQLExecutor class to parse and execute SQL commands.
 """
 import sqlparse
-from sqlparse.sql import IdentifierList, Identifier
+from sqlparse.sql import IdentifierList
 from sqlparse.tokens import Keyword
-from core.file_manager import StorageEngine
 class SQLExecutor:
     """Parse and execute SQL commands."""
     def __init__(self, storage_engine):
