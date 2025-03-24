@@ -3,10 +3,11 @@
 import os
 import json
 from typing import Any
+from core import ROOT
 
 class StorageEngine():
     """this is used for data persistency"""
-    path = f"{os.getenv("ROOT")}/data/"
+    path = f"{ROOT}/data/"
     def __init__(self):
         self.metadata: Any
         self.tables = []
@@ -15,7 +16,7 @@ class StorageEngine():
 
     def drop(self):
         """remove the database"""
-        os.chdir(os.getenv("ROOT"))
+        os.chdir(ROOT)
         os.rmdir(self.path)
 
     def use(self, db_name):
@@ -40,12 +41,12 @@ class StorageEngine():
     @staticmethod
     def list_db():
         """list all database"""
-        db = f"{os.getenv("ROOT")}/data"
+        db = f"{ROOT}/data"
         return "|".join(os.listdir(db))
     @classmethod
     def create_database(cls, db_name):
         """this create a databse from a storage engine class"""
-        cls.path = f"{os.getenv("ROOT")}/data/{db_name}_db"
+        cls.path = f"{ROOT}/data/{db_name}_db"
         dbs = StorageEngine.list_db()
         cls.metadata = Metadata(db_name)
         if f"{db_name}_db" in dbs:
@@ -68,7 +69,7 @@ class StorageEngine():
 class Metadata():
     """the metadata of table"""
     def __init__(self, db_name):
-        self.path = f"{os.getenv("ROOT")}/data/{db_name}_db/metadata"
+        self.path = f"{ROOT}/data/{db_name}_db/metadata"
 
     def write_metadata(self, new_table, schema):
         """create a schema for the database"""
