@@ -57,14 +57,13 @@ class StorageEngine():
                 infos = {  "db_name": db_name,"tables": [] }
                 json.dump(infos, file, indent=4)
             print("Database created")
-    @classmethod
-    def list_tables(cls, db_name):
+
+    def list_tables(self):
         """List all table in a database"""
-        tables = os.listdir(f"{cls.path}/{db_name}_db")
-        for i in tables:
+        for i in self.tables:
             if i == "metadata":
-                tables.remove(i)
-        return "\t".join(tables)
+                self.tables.remove(i)
+        return "\t".join(self.tables)
 
 class Metadata():
     """the metadata of table"""
